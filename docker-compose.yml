@@ -17,8 +17,9 @@ services:
       MYSQL_USER: initium
       MYSQL_PASSWORD: initium
     volumes:
-      # Users table ships with core; seed the dev DB from the installed package.
-      - ./vendor/timbotron/initium-php-core/migrations/001-migration-start.sql:/docker-entrypoint-initdb.d/001-migration-start.sql:ro
+      # Schema ships with core; seed the dev DB from all of its migrations
+      # (MySQL runs every *.sql in this dir in filename order on first init).
+      - ./vendor/timbotron/initium-php-core/migrations:/docker-entrypoint-initdb.d:ro
       - dbdata:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uinitium", "-pinitium"]

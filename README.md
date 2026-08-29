@@ -30,8 +30,8 @@ storage/sessions/     private session store, above the web root
 composer create-project timbotron/initium-php-skeleton myapp
 cd myapp
 # post-create copies config/_env.php.template → config/_env.php; fill in real values
-# import the users table (shipped by core):
-mysql -u <user> -p <db> < vendor/timbotron/initium-php-core/migrations/001-migration-start.sql
+# import the schema (shipped by core — users + login_attempts):
+for f in vendor/timbotron/initium-php-core/migrations/*.sql; do mysql -u <user> -p <db> < "$f"; done
 php -S localhost:8000 -t public
 ```
 
