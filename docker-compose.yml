@@ -1,0 +1,64 @@
+# Lightweight local/test stack for an InitiumPHP app: Caddy + php-fpm + MySQL.
+# Web root is public/. Core is resolved locally via the ../initium-php-core path
+# repository (see composer.json); at publish time (CODE-103) that becomes a plain
+# Packagist require and the ../initium-php-core mount below is no longer needed.
+#
+# Usage:
+#   cp config/_env.php.template config/_env.php   # then set the docker values below:
+#                                                 #   DB_SERVER=db, DB_NAME/USER/PASS=initium
+#   docker compose run --rm composer              # one-time: install vendor/ (copies core in)
+#   docker compose up -d                          # app on http://localhost:8080
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: initium
+      MYSQL_USER: initium
+      MYSQL_PASSWORD: initium
+    volumes:
+      # Users table ships with core; seed the dev DB from the installed package.
+      - ./vendor/timbotron/initium-php-core/migrations/001-migration-start.sql:/docker-entrypoint-initdb.d/001-migration-start.sql:ro
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uinitium", "-pinitium"]
+      interval: 5s
+      retries: 12
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php.Dockerfile
+    working_dir: /srv
+    volumes:
+      - ./:/srv
+    # ensure the private session store is writable by the php-fpm (www-data) worker
+    command: sh -c "mkdir -p /srv/storage/sessions && chown -R www-data:www-data /srv/storage && exec php-fpm"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./:/srv
+    depends_on:
+      - php
+
+  # one-shot: `docker compose run --rm composer` to populate vendor/.
+  # The ../initium-php-core mount lets the path repository resolve inside the
+  # container (composer.json's url is ../initium-php-core, i.e. /initium-php-core).
+  composer:
+    image: composer:2
+    working_dir: /srv
+    volumes:
+      - ./:/srv
+      - ../initium-php-core:/initium-php-core:ro
+    command: install --ignore-platform-reqs --no-interaction
+    profiles: ["setup"]
+
+volumes:
+  dbdata:

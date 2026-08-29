@@ -1,0 +1,39 @@
+{
+    "name": "timbotron/initium-php-skeleton",
+    "description": "Boilerplate app for InitiumPHP: a small PHP starter with turnkey user authentication. Create a project from this, fill in config, and go.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        { "name": "Tim Habersack" }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "timbotron/initium-php-core": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../initium-php-core",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "timbotron/initium-php-core": "1.0.0"
+                }
+            }
+        }
+    ],
+    "scripts": {
+        "post-create-project-cmd": [
+            "php -r \"file_exists('config/_env.php') || copy('config/_env.php.template', 'config/_env.php');\"",
+            "php -r \"is_dir('storage/sessions') || mkdir('storage/sessions', 0700, true);\""
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
