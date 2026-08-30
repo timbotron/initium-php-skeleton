@@ -1,5 +1,6 @@
 <?php
 
+use Initium\Admin\Routes as AdminRoutes;
 use Initium\Auth\Routes as AuthRoutes;
 use Initium\Config;
 use Initium\Kernel;
@@ -18,4 +19,5 @@ View::override(__DIR__ . '/../templates');
 (new Kernel(__DIR__ . '/../storage/sessions'))
     ->routes(require __DIR__ . '/../routes/web.php')   // app routes
     ->routes([AuthRoutes::class, 'register'])          // core auth routes
+    ->routes([AdminRoutes::class, 'register'])         // core admin area
     ->run();

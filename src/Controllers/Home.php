@@ -21,7 +21,10 @@ class Home extends Base {
     public function __construct() {
         parent::__construct();
         $this->templates = View::engine();
-        $this->templates->addData(['is_logged_in' => Cred::userDetails() ? true : false], ['app::basic']);
+        $this->templates->addData([
+            'is_logged_in' => Cred::userDetails() ? true : false,
+            'is_admin' => Cred::isAdmin(),
+        ], ['app::basic']);
     }
 
     public function home_page() {

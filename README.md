@@ -70,6 +70,20 @@ activate the account. `ALLOW_SIGNUPS=0` disables the create-account route
 entirely (it 404s); with signups off, seed your first user by inserting a row and
 using the same reset-link trick.
 
+## Admin area
+
+Core ships a small admin settings area at `/admin` (mounted in
+`public/index.php`). It has two toggles — **allow new sign-ups** and **require
+valid email** — stored in the `settings` table and editable at runtime. Turning
+"require valid email" off skips the Mailgun set-password email and sends new
+users straight to the set-password page, which is handy for installs without
+Mailgun (see Authentication & email above).
+
+Access is admin-only: a logged-in user reaches it when their `users.is_admin`
+flag is `1`, or when their email matches the optional `ADMIN_EMAIL` constant in
+`config/_env.php` (the easiest way to make yourself the first admin). Everyone
+else gets a 404.
+
 ## Adding your own routes, pages, and templates
 
 - **Routes** — add them in `routes/web.php`; the callback receives a
