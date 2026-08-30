@@ -26,16 +26,21 @@ storage/sessions/     private session store, above the web root
 
 ## Getting started
 
+You'll need PHP ≥ 8.0 (with `pdo_mysql` and `curl`), Composer, and a MySQL
+database you can connect to.
+
 ```bash
 composer create-project timbotron/initium-php-skeleton myapp
 cd myapp
-# post-create copies config/_env.php.template → config/_env.php; fill in real values
-# import the schema (shipped by core — users + login_attempts):
+# post-create copies config/_env.php.template → config/_env.php; now fill in real
+# values (DB connection, SITE_URL, Mailgun — see Config below)
+# import the schema into your database (shipped by core — users + login_attempts):
 for f in vendor/timbotron/initium-php-core/migrations/*.sql; do mysql -u <user> -p <db> < "$f"; done
 php -S localhost:8000 -t public
 ```
 
-Framework fixes arrive with `composer update`.
+Framework fixes arrive with `composer update`. If you just want a local stack
+without installing PHP/MySQL yourself, skip ahead to the Docker harness.
 
 ## Config
 
@@ -43,6 +48,27 @@ Framework fixes arrive with `composer update`.
 `config/_env.php.template` for the required set). Core validates the required
 constants at boot via `\Initium\Config::validate()` and fails fast if any are
 missing. `_env.php` is gitignored and never committed.
+
+## Authentication & email
+
+Accounts are activated by email, not by a password field at signup. Creating an
+account (or requesting a password reset) inserts/updates the user and emails a
+**set-password link** via Mailgun; the user stays inactive until they follow it
+and set a password. So valid `EMAIL_MAILGUN_*` values are required for the normal
+flow to work end-to-end.
+
+For **local testing without Mailgun**, no email will arrive — grab the link
+target yourself. After submitting the create-account or forgot-password form,
+read the UUID from the database and visit the reset URL directly:
+
+```sql
+SELECT email, password_reset FROM users WHERE password_reset <> '';
+```
+
+Then open `<SITE_URL>password-reset/<password_reset>` to set a password and
+activate the account. `ALLOW_SIGNUPS=0` disables the create-account route
+entirely (it 404s); with signups off, seed your first user by inserting a row and
+using the same reset-link trick.
 
 ## Adding your own routes, pages, and templates
 
@@ -88,9 +114,9 @@ need them.
 
 ## Local development against a working copy of core
 
-Until core is published to Packagist (CODE-103), this repo resolves it through a
-Composer **path repository** pointing at a sibling `../initium-php-core` checkout
-(`repositories` block in `composer.json`, `symlink: false` so it is copied into
-`vendor/` — which keeps the docker mounts working). At publish time that block is
-removed and `require` resolves `timbotron/initium-php-core` straight from
-Packagist with no other change.
+To hack on the framework and app together, resolve core from a sibling checkout
+instead of Packagist. Add a path repository to `composer.json` pointing at your
+local `../initium-php-core` (use `"symlink": false` so it's copied into `vendor/`,
+which keeps the Docker mounts working), then `composer update
+timbotron/initium-php-core`. Remove the `repositories` block to go back to the
+published package — the `require` line is unchanged either way.

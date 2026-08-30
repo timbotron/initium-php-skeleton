@@ -1,7 +1,7 @@
 # Lightweight local/test stack for an InitiumPHP app: Caddy + php-fpm + MySQL.
 # Web root is public/. Core is resolved locally via the ../initium-php-core path
-# repository (see composer.json); at publish time (CODE-103) that becomes a plain
-# Packagist require and the ../initium-php-core mount below is no longer needed.
+# repository (see composer.json); once core is published to Packagist that becomes
+# a plain require and the ../initium-php-core mount below is no longer needed.
 #
 # Usage:
 #   cp config/_env.php.template config/_env.php   # then set the docker values below:
