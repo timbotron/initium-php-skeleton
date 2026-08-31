@@ -15,18 +15,6 @@
             "App\\": "src/"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../initium-php-core",
-            "options": {
-                "symlink": false,
-                "versions": {
-                    "timbotron/initium-php-core": "1.0.0"
-                }
-            }
-        }
-    ],
     "scripts": {
         "post-create-project-cmd": [
             "php -r \"file_exists('config/_env.php') || copy('config/_env.php.template', 'config/_env.php');\"",

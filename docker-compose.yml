@@ -1,12 +1,10 @@
 # Lightweight local/test stack for an InitiumPHP app: Caddy + php-fpm + MySQL.
-# Web root is public/. Core is resolved locally via the ../initium-php-core path
-# repository (see composer.json); once core is published to Packagist that becomes
-# a plain require and the ../initium-php-core mount below is no longer needed.
+# Web root is public/. Core is pulled from Packagist (see composer.json require).
 #
 # Usage:
 #   cp config/_env.php.template config/_env.php   # then set the docker values below:
 #                                                 #   DB_SERVER=db, DB_NAME/USER/PASS=initium
-#   docker compose run --rm composer              # one-time: install vendor/ (copies core in)
+#   docker compose run --rm composer              # one-time: install vendor/
 #   docker compose up -d                          # app on http://localhost:8080
 services:
   db:
@@ -50,14 +48,11 @@ services:
       - php
 
   # one-shot: `docker compose run --rm composer` to populate vendor/.
-  # The ../initium-php-core mount lets the path repository resolve inside the
-  # container (composer.json's url is ../initium-php-core, i.e. /initium-php-core).
   composer:
     image: composer:2
     working_dir: /srv
     volumes:
       - ./:/srv
-      - ../initium-php-core:/initium-php-core:ro
     command: install --ignore-platform-reqs --no-interaction
     profiles: ["setup"]
 
