@@ -4,6 +4,7 @@
 # Usage:
 #   cp config/_env.php.template config/_env.php   # then set the docker values below:
 #                                                 #   DB_SERVER=db, DB_NAME/USER/PASS=initium
+#                                                 #   TRUST_FORWARDED=true (Caddy is the trusted proxy here)
 #   docker compose run --rm composer              # one-time: install vendor/
 #   docker compose up -d                          # app on http://localhost:8080
 services:
