@@ -70,6 +70,14 @@ activate the account. `ALLOW_SIGNUPS=0` disables the create-account route
 entirely (it 404s); with signups off, seed your first user by inserting a row and
 using the same reset-link trick.
 
+For a real **no-email install** (not just local testing), set `NO_EMAIL_SIGNUP`
+truthy in `config/_env.php`. That unlocks the admin **require valid email** toggle
+(below); with it off, new users skip Mailgun entirely and are shown their
+set-password link on screen. This path is **enumerable by design** — showing that
+link reveals whether an account already existed — so enable it only on
+trusted/internal installs. Without the constant the toggle stays locked on and
+email verification is always required.
+
 ## Admin area
 
 Core ships a small admin settings area at `/admin` (mounted in
@@ -77,7 +85,9 @@ Core ships a small admin settings area at `/admin` (mounted in
 valid email** — stored in the `settings` table and editable at runtime. Turning
 "require valid email" off skips the Mailgun set-password email and sends new
 users straight to the set-password page, which is handy for installs without
-Mailgun (see Authentication & email above).
+Mailgun. That toggle is **locked on** unless the install sets the
+`NO_EMAIL_SIGNUP` constant, because the no-email path is enumerable by design
+(see Authentication & email above).
 
 Access is admin-only: a logged-in user reaches it when their `users.is_admin`
 flag is `1`, or when their email matches the optional `ADMIN_EMAIL` constant in
