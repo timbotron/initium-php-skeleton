@@ -46,3 +46,22 @@ define('LOGIN_TIMEOUT', 336); // hours, 336 = 2 weeks
 // already existed. Enable ONLY on trusted/internal installs. Without this
 // constant the toggle is locked on and email verification is always required.
 // define('NO_EMAIL_SIGNUP', true);
+
+// Optional. How often (minutes, default 5) a logged-in user's is_active /
+// is_admin flags are re-read from the database. Lets deactivating a user or
+// revoking admin take effect on their existing (weeks-long) session without a
+// re-login, at the cost of one indexed lookup per interval per user.
+// define('SESSION_RECHECK', 5);
+
+// Optional. Login-throttle ceilings: LOGIN_THROTTLE_MAX (default 10) failures
+// per (ip, email) trips the lockout; LOGIN_THROTTLE_IP_MAX (default 50) is a
+// looser per-IP ceiling across all accounts so one NAT of users doesn't share a
+// single budget; LOGIN_THROTTLE_WINDOW (default 15) is the window in minutes.
+// define('LOGIN_THROTTLE_MAX', 10);
+// define('LOGIN_THROTTLE_IP_MAX', 50);
+// define('LOGIN_THROTTLE_WINDOW', 15);
+
+// Optional. Persistent PDO connections: on php-fpm the worker reuses one MySQL
+// connection across requests instead of reconnecting each time. Leave off unless
+// you understand the trade-offs (connection state can outlive a request).
+// define('DB_PERSISTENT', true);
